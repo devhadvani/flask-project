@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category, Subcategory, Product</title>
+</head>
+<body>
+    <h1>Add Category</h1>
+    <form action="/add_category" method="post">
+        <label for="category_name">Category Id:</label>
+        <input type="text" id="category_name" name="id" required>
+        <label for="category_name">Category Name:</label>
+        <input type="text" id="category_name" name="name" required>
+        <button type="submit">Add Category</button>
+    </form>
+
+    <h1>Add Subcategory</h1>
+    <form action="/add_subcategory" method="post">
+        
+        <input type="text" id="subcategory_name" name="id" required>
+        <label for="subcategory_name">Subcategory id:</label>
+        <input type="text" id="subcategory_name" name="name" required>
+        <label for="category_id">Category name:</label>
+        <input type="number" id="category_id" name="category_id" required>
+        <button type="submit">Add Subcategory</button>
+    </form>
+
+    <h1>Add Product</h1>
+    <form action="/add_product" method="post">
+        <label for="product_name">Product Name:</label>
+        <input type="text" id="product_name" name="product_name" required>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required>
+        <label for="stock_quantity">Stock Quantity:</label>
+        <input type="number" id="stock_quantity" name="stock_quantity" required>
+        <label for="category_id">Category ID:</label>
+        <input type="number" id="category_id" name="category_id" required>
+        <label for="subcategory_id">Subcategory ID:</label>
+        <input type="number" id="subcategory_id" name="subcategory_id" required>
+        <button type="submit">Add Product</button>
+    </form>
+</body>
+</html>
