@@ -1,12 +1,29 @@
 from flask import Flask,render_template , request,redirect
 from flask_sqlalchemy import SQLAlchemy
+import os
+from werkzeug.utils import secure_filename
+from flask_migrate import Migrate
 # from .models import Users
 app = Flask(__name__)
+
+
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:root@localhost:3306/online_store"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
+migrate = Migrate(app, db)
+
+
 
 class Users(db.Model):
     email = db.Column(db.String(120),primary_key=True)
@@ -27,21 +44,22 @@ class Subcategory(db.Model):
     category = db.relationship('Category', backref='subcategories')
 
 class Product(db.Model):
-    product_id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100))
     description = db.Column(db.String(255))
     price = db.Column(db.Float)
     stock_quantity = db.Column(db.Integer)
+    image_url = db.Column(db.String(255))
     category_id = db.Column(db.Integer, db.ForeignKey('category.category_id'))
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.subcategory_id'))
     category = db.relationship('Category', backref='products')
     subcategory = db.relationship('Subcategory', backref='products')
 
-class ProductImage(db.Model):
-    image_id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'))
-    image_url = db.Column(db.String(255))
-    product = db.relationship('Product', backref='images')
+# class ProductImage(db.Model):
+#     image_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'))
+#     image_url = db.Column(db.String(255))
+#     product = db.relationship('Product', backref='images')
 # class Order(db.Model):
 #     order_id = db.Column(db.Integer, primary_key=True)
 #     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
@@ -117,6 +135,37 @@ def add_subcategory():
         return redirect('admin')
     pass
 
+
+@app.route('/add_product', methods=['POST'])
+def add_product():
+    if request.method == "POST":
+        name = request.form['product_name']
+        desc = request.form['description']
+        price = request.form['price']
+        quantity = request.form['stock_quantity']
+        cid = request.form['cid']
+        scid = request.form['scid']
+        image = request.files['image']
+        print(image)
+        print("image:",image.filename)
+        im = secure_filename(image.filename)
+
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'],im))
+        image_url = os.path.join(app.config['UPLOAD_FOLDER'],im)
+
+        add = Product(name= name, description= desc,price= price, stock_quantity= quantity,category_id=cid,subcategory_id=scid,image_url=im)
+        # addimage = ProductImage(product_id =1,image_url = image)
+        db.session.add(add)
+        # db.session.add(addimage)
+        db.session.commit()
+        return redirect('admin')
+    return redirect('admin')
+
+
+@app.route('/list')
+def list_product():
+    data = Product.query.all()
+    return render_template('admin/admin.html', product=data)
 
 if __name__ =="__main__":
     app.run(debug=True)
