@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="{{ url_for('static',filename='css/style.css')}}" rel="stylesheet">
+</head>
+
+{%include 'nav.html' %}
+<body>
+<div class="seller container">
+    <h2>Top Sales</h2>
+    <div class="best-seller">
+        {% for product in product %}
+        <div class="best-p1">
+            <img src="{{url_for('static', filename='uploads/' + product.image_url)}}" alt="img">
+            <div class="best-p1-txt">
+                <div class="name-of-p">
+                    <p>{{product.name}}</p>
+                </div>
+                <div class="price">
+                    Rs.{{product.price}}
+                </div>
+                <div class="buy-now">
+                    <button><a href="shop/{{product.product_id}}">Buy  Now</a></button>
+                </div>
+            </div>
+        </div>
+        {%endfor%}
+    </div>
+</div>

@@ -1,10 +1,10 @@
 # routes.py
 
+from werkzeug.utils import secure_filename
+import os
 from flask import render_template, request, redirect
 from .__init__ import app, db
 from .models import Users, Category, Subcategory, Product
-from werkzeug.utils import secure_filename
-import os
 # Define your routes here
 
 UPLOAD_FOLDER = 'app/static/uploads'
@@ -45,7 +45,10 @@ def login():
 @app.route('/admin')
 def admin():
     data = Product.query.all()
-    return render_template('admin/admin.html',product=data)
+    category = Category.query.all()
+    sub_category = Subcategory.query.all()
+    return render_template('admin/admin.html',product=data,category=category,sub_category=sub_category)
+
 
 @app.route('/add_category',methods=['GET','POST'])
 def add_category():
@@ -84,16 +87,9 @@ def add_product():
         cid = request.form['cid']
         scid = request.form['scid']
         image = request.files['image']
-        print(image)
-        print("image:",image.filename)
         im = secure_filename(image.filename)
-        print(im)
-        print(os.path.join(app.config['UPLOAD_FOLDER'],im))
-
-
         image.save(os.path.join(app.config['UPLOAD_FOLDER'],im))
         image_url = os.path.join(app.config['UPLOAD_FOLDER'],im)
-
         add = Product(name= name, description= desc,price= price, stock_quantity= quantity,category_id=cid,subcategory_id=scid,image_url=im)
         # addimage = ProductImage(product_id =1,image_url = image)
         db.session.add(add)
@@ -110,3 +106,29 @@ def delete_product(id):
         db.session.delete(obj)
         db.session.commit()
         return redirect('/admin')
+
+@app.route('/update/<string:id>',methods=['POST',"GET"])
+def update_product(id):
+    product = Product.query.get(id)
+    category = Category.query.all()
+    sub_category = Subcategory.query.all()
+    if request.method == "POST":
+        product.name = request.form['product_name']
+        product.description = request.form['description']
+        product.price = request.form['price']
+        product.stock_quantity = request.form['stock_quantity']
+        product.category_id = request.form['cid']
+        product.subcategory_id = request.form['scid']
+        db.session.commit()
+    return render_template('admin/update_product.html',product=product,category=category,sub_category=sub_category)
+
+@app.route('/shop')
+def shop_products():
+    product = Product.query.all()
+    return render_template('products.html',product=product)
+
+
+@app.route('/shop/<string:id>')
+def product_page(id):
+    product = Product.query.get(id)
+    return render_template('product_page.html',product=product)

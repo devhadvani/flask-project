@@ -1,0 +1,89 @@
+<html>
+<head>
+<style>
+
+    .container {
+        display: flex;
+        padding-top: 30px;
+    }
+    
+    .product-image {
+        flex: 1;
+    }
+    
+    .product-image img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .product-details {
+        flex: 1;
+        padding: 0 20px;
+    }
+    
+    .product-details h2 {
+        font-size: 24px;
+        margin-top: 0;
+    }
+    
+    .product-details .description {
+        font-size: 16px;
+    }
+    
+    .product-details .price {
+        font-size: 20px;
+        color: green;
+        margin-bottom: 20px;
+    }
+    
+    .product-details .quantity {
+        margin-bottom: 20px;
+    }
+    
+    .product-details .quantity label {
+        font-size: 16px;
+        margin-right: 10px;
+    }
+    
+    .product-details .quantity input {
+        width: 60px;
+        padding: 5px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+    }
+    
+    .product-details .add-to-cart {
+        padding: 10px 20px;
+        font-size: 18px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .product-details .add-to-cart:hover {
+        background-color: #0056b3;
+    }
+    
+</style>
+<link href="{{ url_for('static',filename='css/style.css')}}" rel="stylesheet">
+</head>
+<body>
+    {%include 'nav.html'%}
+<div class="container">
+    <div class="product-image">
+        <img src="{{url_for('static',filename='uploads/' + product.image_url)}}" alt="Product Image">
+    </div>
+    <div class="product-details">
+        <h2>{{product.name}}</h2>
+        <p class="description">{{product.description}}</p>
+        <p class="price">Rs.{{product.price}}</p>
+        <div class="quantity">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1">
+        </div>
+        <button class="add-to-cart">Add to Cart</button>
+    </div>
+</div>
+</body></html>

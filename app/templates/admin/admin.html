@@ -4,57 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Category, Subcategory, Product</title>
+    <style>
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .product {
+            width: calc(50% - 20px);
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .product-details {
+            padding: 10px;
+        }
+        
+        .product-details h2 {
+            margin-top: 0;
+        }
+        
+        .product-actions {
+            padding: 10px;
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .product {
+                width: 100%;
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, textarea, select {
+            width: calc(50% - 12px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Add Category</h1>
-    <form action="/add_category" method="post">
-        <label for="category_name">Category Id:</label>
-        <input type="text" id="category_name" name="id" required>
-        <label for="category_name">Category Name:</label>
-        <input type="text" id="category_name" name="name" required>
-        <button type="submit">Add Category</button>
-    </form>
+    <div class="container">
+        <h1>Add Category</h1>
+        <form action="/add_category" method="post">
+            <div class="form-row">
+                <label for="category_id">Category Id:</label>
+                <input type="text" id="category_id" name="id" required>
+            </div>
+            <div class="form-row">
+                <label for="category_name">Category Name:</label>
+                <input type="text" id="category_name" name="name" required>
+            </div>
+            <button type="submit">Add Category</button>
+        </form>
 
-    <h1>Add Subcategory</h1>
-    <form action="/add_subcategory" method="post">
-        
-        <input type="text" id="subcategory_name" name="id" required>
-        <label for="subcategory_name">Subcategory id:</label>
-        <input type="text" id="subcategory_name" name="name" required>
-        <label for="category_id">Category name:</label>
-        <input type="number" id="category_id" name="category_id" required>
-        <button type="submit">Add Subcategory</button>
-    </form>
+        <h1>Add Subcategory</h1>
+        <form action="/add_subcategory" method="post">
+            <div class="form-row">
+                <label for="subcategory_id">Subcategory Id:</label>
+                <input type="text" id="subcategory_id" name="id" required>
+            </div>
+            <div class="form-row">
+                <label for="subcategory_name">Subcategory Name:</label>
+                <input type="text" id="subcategory_name" name="name" required>
+            </div>
+            <div class="form-row">
+                <label for="category_id">Category ID:</label>
+                <input type="number" id="category_id" name="category_id" required>
+            </div>
+            <button type="submit">Add Subcategory</button>
+        </form>
 
-    <h1>Add Product</h1>
-    <form action="/add_product" method="post" enctype="multipart/form-data">
-        <label for="product_name">Product Name:</label>
-        <input type="text" id="product_name" name="product_name" required>
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea>
-        <label for="price">Price:</label>
-        <input type="number" id="price" name="price" step="0.01" required>
-        <label for="stock_quantity">Stock Quantity:</label>
-        <input type="number" id="stock_quantity" name="stock_quantity" required>
-        <label for="category_id">Category ID:</label>
-        <input type="number" id="category_id" name="cid" required>
-        <label for="subcategory_id">Subcategory ID:</label>
-        <input type="number" id="subcategory_id" name="scid" required>
-        <input type="file" name="image" multiple="true">
-        <button type="submit">Add Product</button>
+        <h1>Add Product</h1>
+        <form action="/add_product" method="post" enctype="multipart/form-data">
+            <div class="form-row">
+                <label for="product_name">Product Name:</label>
+                <input type="text" id="product_name" name="product_name" required>
+            </div>
+            <div class="form-row">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-row">
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" step="0.01" required>
+            </div>
+            <div class="form-row">
+                <label for="stock_quantity">Stock Quantity:</label>
+                <input type="number" id="stock_quantity" name="stock_quantity" required>
+            </div>
+            <div class="form-row">
+                <label for="category_id">Category ID:</label>
+                <select name="cid">
+                    {% for category in category %}
+                        <option value="{{ category.category_id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="subcategory_id">Subcategory ID:</label>
+                <select name="scid">
+                    {% for subcategory in sub_category %}
+                        <option value="{{ subcategory.subcategory_id }}">{{ subcategory.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="image">Product Image:</label>
+                <input type="file" id="image" name="image" multiple="true">
+            </div>
+            <button type="submit">Add Product</button>
+        </form>
+        <div class="product-list">
+            {% for product in product %}
+            <div class="product">
+                <div class="product-image">
+                    <img src="{{ url_for('static', filename='uploads/' + product.image_url) }}" alt="Product Image">
+                </div>
+                <div class="product-details">
+                    <h2>{{ product.name }}</h2>
+                    <p>Description: {{ product.description }}</p>
+                    <p>Price: {{ product.price }}</p>
+                    <p>Stock Quantity: {{ product.stock_quantity }}</p>
+                    <p>subcategory: {{ product.subcategory.name }}</p>
+                </div>
+                <div class="product-actions">
+                    <form action="/delete/{{ product.product_id }}" method="post">
+                        <button type="submit">Delete</button>
+                    </form>
+                    <a href="/update/{{ product.product_id }}"><button>Update</button></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
 
-    </form>
-
-
-{% for product in product %}
-
-{{product.name}}
-{{product.price}}
-<img src="{{ url_for('static',filename='uploads/' + product.image_url)}}" height=40px ,width="30px">
-<a href="delete/{{product.product_id}}"><button >Delete</button></a>
-<br>
-{% endfor%}
-
-
+    </div>
 </body>
 </html>

@@ -1,0 +1,36 @@
+
+<a href="/admin">back</a>
+<h1>Add Product</h1>
+    <form method="post" enctype="multipart/form-data">
+        <label for="product_name">Product Name:</label>
+        <input type="text" id="product_name" name="product_name" required value="{{product.name}}">
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required>{{product.description}}</textarea>
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" value="{{product.price}}" required>
+        <label for="stock_quantity">Stock Quantity:</label>
+        <input type="number" id="stock_quantity" name="stock_quantity" value="{{product.stock_quantity}}" required>
+       
+       
+       
+        <label for="category_id">Category ID:</label>
+        <select name="cid">
+            {% for category in category %}
+                <option value="{{ category.category_id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="subcategory_id">Subcategory ID:</label>
+        <select name="scid">
+            {% for subcategory in sub_category %}
+                <option value="{{ subcategory.subcategory_id }}">{{ subcategory.name }}</option>
+            {% endfor %}
+        </select>
+
+
+
+      
+        <input type="file" name="image" multiple="true">
+        <button type="submit">update Product</button>
+    </form>
