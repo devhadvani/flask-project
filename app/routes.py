@@ -122,13 +122,26 @@ def update_product(id):
         db.session.commit()
     return render_template('admin/update_product.html',product=product,category=category,sub_category=sub_category)
 
-@app.route('/shop')
+@app.route('/shop',methods=['GET','POST'])
 def shop_products():
-    product = Product.query.all()
-    return render_template('products.html',product=product)
+    name = request.args.get('s')
+    if name:
+        products = Product.query.filter(Product.name.like(f"%{name}%")).all()
+    else:
+        products = Product.query.all()
+    return render_template('products.html', product=products, name=name)
 
 
 @app.route('/shop/<string:id>')
 def product_page(id):
     product = Product.query.get(id)
     return render_template('product_page.html',product=product)
+
+
+# @app.route('/search',methods=['GET','POST'])
+# def search():
+#     name = request.args.get('s')
+#     print(name)
+#     product = Product.query.filter(Product.name.like("%" + name + "%")).all()
+#     print(product)
+#     return render_template("/products.html",product=product,name=name)

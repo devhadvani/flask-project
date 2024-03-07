@@ -3,11 +3,67 @@
 
 <head>
     <link href="{{ url_for('static',filename='css/style.css')}}" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0px;
+        }
+        
+        .search-form {
+            text-align: center;
+        }
+        
+        .search-input {
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+        
+        .search-submit {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .search-submit:hover {
+            background-color: #0056b3;
+        }
+        
+        </style>
 </head>
 
 {%include 'nav.html' %}
 <body>
-<div class="seller container">
+    <div class="container">
+        <form action="/shop" method="get" class="search-form">
+            <input type="search" placeholder="Search" name="s" class="search-input">
+            <input type="submit" value="Submit" class="search-submit">
+        </form>
+
+      
+    </div>
+<div class="container">
+{% if name %}
+        <h2> search result for {{name}}</h2>
+        {% endif%}
+</div>
+
+<div class="seller container"> 
+     
     <h2>Top Sales</h2>
     <div class="best-seller">
         {% for product in product %}
