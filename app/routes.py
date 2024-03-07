@@ -1,7 +1,9 @@
-# routes.py
-
-from werkzeug.utils import secure_filename
+'''
+routes.py
+this is routes.py file
+'''
 import os
+from werkzeug.utils import secure_filename
 from flask import render_template, request, redirect
 from .__init__ import app, db
 from .models import Users, Category, Subcategory, Product
@@ -16,12 +18,17 @@ print(os.getcwd)
 
 @app.route('/')
 def home():
-    print(os.getcwd())
-
+    '''     
+     will show home page of the website
+    '''
     return render_template('index.html')
 
 @app.route('/register',methods=['GET','POST'])
 def register():
+    '''
+    this function will handle a registration logic.
+    user will enter name,email,password and it will store in database
+    '''
     if request.method == "POST":
         name = request.form['username']
         email = request.form['email']
@@ -36,6 +43,7 @@ def register():
         return redirect('/')
 
     return render_template('register.html')
+
 
 @app.route('/login')
 def login():
@@ -61,7 +69,6 @@ def add_category():
         db.session.add(add)
         db.session.commit()
         return redirect('admin')
-    pass
 
 @app.route('/add_subcategory',methods=['GET','POST'])
 def add_subcategory():
