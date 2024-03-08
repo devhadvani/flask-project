@@ -84,3 +84,15 @@
         {%endfor%}
     </div>
 </div>
+
+
+
+{% if product.has_prev %}
+<a href="{{ url_for('shop_products', page=product.prev_num, s=name) }}">Previous</a>
+{% endif %}
+
+Page {{ product.page }} of {{ product.pages }}
+
+{% if product.has_next %}
+<a href="{{ url_for('shop_products', page=product.next_num, s=name) }}">Next</a>
+{% endif %}

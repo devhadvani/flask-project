@@ -3,24 +3,72 @@ routes.py
 this is routes.py file
 '''
 import os
+import jwt
+from functools import wraps
+from werkzeug.security import generate_password_hash,check_password_hash
 from werkzeug.utils import secure_filename
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect,jsonify
 from .__init__ import app, db
 from .models import Users, Category, Subcategory, Product
+import datetime
+from flask_login import LoginManager, UserMixin, login_user, logout_user,login_required
 # Define your routes here
+from flask_login import current_user
+
+
 
 UPLOAD_FOLDER = 'app/static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SECRET_KEY']='004f2af45d3a4e161a7dd2d17fdae47f'
+
 
 print(os.getcwd)
+
+# def token_required(f):
+#    @wraps(f)
+#    def decorator(*args, **kwargs):
+#        token = None
+#        if 'x-access-tokens' in request.headers:
+#            token = request.headers['x-access-tokens']
+ 
+#        if not token:
+#            return jsonify({'message': 'a valid token is missing'})
+#        try:
+#            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+#            current_user = Users.query.filter_by(public_id=data['public_id']).first()
+#        except:
+#            return jsonify({'message': 'token is invalid'})
+ 
+#        return f(current_user, *args, **kwargs)
+#    return decorator
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+# db.init_app(app)
+ 
+
+# with app.app_context():
+#     db.delete_all()
+#     db.create_all()
+ 
+@login_manager.user_loader
+def loader_user(user_id):
+    return Users.query.get(user_id)
 
 @app.route('/')
 def home():
     '''     
      will show home page of the website
     '''
+    # Check if user is logged in
+    if current_user.is_authenticated:
+        # User is logged in
+        print("User is logged in.")
+    else:
+        # User is not logged in
+        print("User is not logged in.")
     return render_template('index.html')
 
 @app.route('/register',methods=['GET','POST'])
@@ -33,10 +81,8 @@ def register():
         name = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        print(name)
-        print(email)
-        print(password)
-        user = Users(email=email, password=password,username=name)
+        harshed_password = generate_password_hash(password,method='pbkdf2:sha256')
+        user = Users(email=email, password=harshed_password,username=name)
         db.session.add(user)
         db.session.commit()
 
@@ -45,12 +91,32 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'POST':
+        username = request.form.get('email')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            return render_template('login.html', message='Username and password are required', alert_type='danger')
+
+        user = Users.query.filter_by(email=username).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect('/')
+        # if user and check_password_hash(user.password, password):
+        #     token = jwt.encode({'public_id': user.email, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)}, app.config['SECRET_KEY'], algorithm='HS256')
+            # return jsonify({'token': token})
+            # request.header = token
+            # return render_template('/index.html', token=token)
+
+        return render_template('login.html', message='Invalid username or password', alert_type='danger')
+
+    return render_template('login.html', message='', alert_type='info')
 
 
 @app.route('/admin')
+@login_required
 def admin():
     data = Product.query.all()
     category = Category.query.all()
@@ -85,6 +151,7 @@ def add_subcategory():
 
 
 @app.route('/add_product', methods=['POST'])
+@login_required
 def add_product():
     if request.method == "POST":
         name = request.form['product_name']
@@ -129,22 +196,26 @@ def update_product(id):
         db.session.commit()
     return render_template('admin/update_product.html',product=product,category=category,sub_category=sub_category)
 
-@app.route('/shop',methods=['GET','POST'])
+@app.route('/shop', methods=['GET', 'POST'])
+@login_required
 def shop_products():
+    page = request.args.get('page', 1, type=int)
     name = request.args.get('s')
-    if name:
-        products = Product.query.filter(Product.name.like(f"%{name}%")).all()
-    else:
-        products = Product.query.all()
-    return render_template('products.html', product=products, name=name)
 
+    if name:
+        products = Product.query.filter(Product.name.like(f"%{name}%")).paginate(page=page, per_page=2)
+    else:
+        products = Product.query.paginate(page=page, per_page=2)
+    return render_template('products.html', product=products, name=name)
 
 @app.route('/shop/<string:id>')
 def product_page(id):
     product = Product.query.get(id)
     return render_template('product_page.html',product=product)
 
-
+# @login_manager.unauthorized_handler
+# def unauthorized_callback():
+#     return redirect('/login')
 # @app.route('/search',methods=['GET','POST'])
 # def search():
 #     name = request.args.get('s')
