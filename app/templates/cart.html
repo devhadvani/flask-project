@@ -218,7 +218,50 @@
         </div>
         {% endfor %}
         <!-- End Product Loop -->
+
     </div>
+
+    {% for address in address%}
+{{address.name}}:
+{{address.city}}
+{{address.state}}
+{{address.street_address}}
+<br>
+    {%endfor%}
+
+
+    {%if address_count <=2%}
+    <h2>Add Address</h2>
+    <form action="/add_address" method="post">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="street_address">Street Address:</label><br>
+        <input type="text" id="street_address" name="street_address" required><br><br>
+
+        <label for="city">City:</label><br>
+        <input type="text" id="city" name="city" required><br><br>
+
+        <label for="state">State:</label><br>
+        <input type="text" id="state" name="state" required><br><br>
+
+        <label for="postal_code">Postal Code:</label><br>
+        <input type="text" id="postal_code" name="postal_code" required><br><br>
+
+        <label for="country">Country:</label><br>
+        <input type="text" id="country" name="country" required><br><br>
+
+        <label for="phone_number">Phone Number:</label><br>
+        <input type="text" id="phone_number" name="phone_number" required><br><br>
+
+        <label for="is_default">Is Default:</label><br>
+        <input type="checkbox" id="is_default" name="is_default"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    {%endif%}
+<button> place order</button>
 
     <script>
         // JavaScript for quantity increment and decrement

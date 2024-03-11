@@ -11,7 +11,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from werkzeug.utils import secure_filename
 from flask import render_template, request, redirect,jsonify
 from .__init__ import app, db
-from .models import Users, Category, Subcategory, Product,Cart
+from .models import Users, Category, Subcategory, Product,Cart, Address
 import datetime
 from flask_login import LoginManager, UserMixin, login_user, logout_user,login_required
 # Define your routes here
@@ -253,8 +253,10 @@ def add_to_cart():
 @login_required
 @app.route('/cart',methods=['POST','GET'])
 def cart():
+    address_count = Address.query.filter_by(user_id=current_user.id).count()
+    address = Address.query.filter_by(user_id=current_user.id)
     cart_item = Cart.query.filter_by(user_id= current_user.id)
-    return render_template('cart.html',cart_item=cart_item)
+    return render_template('cart.html',cart_item=cart_item,address=address,address_count=address_count)
 
 
 
@@ -286,3 +288,24 @@ def remove_from_cart():
         db.session.delete(cart)
         db.session.commit()
         return redirect('cart')
+
+@app.route('/add_address',methods=['POST'])
+def add_address():
+    if request.method=="POST":
+        user_id  = current_user.id
+        name = request.form['name']
+        street_address = request.form['street_address']
+        city = request.form['city']
+        state = request.form['state']
+        postal_code = request.form['postal_code']
+        country = request.form['country']
+        phone_number = request.form['phone_number']
+        is_default = bool(request.form.get('is_default'))
+
+        address  = Address(user_id= user_id,name=name,street_address=street_address,city=city,state=state,country=country,postal_code=postal_code,phone_number=phone_number,is_default=is_default)
+        db.session.add(address)
+        db.session.commit()
+        return redirect('/cart')
+
+
+
