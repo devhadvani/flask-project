@@ -10,10 +10,17 @@
             <div class="head-txt ">
                 <p>Free shipping, 30-day return or refund guarantee.</p>
             </div>
+            {% if current_user.is_authenticated%}
+
+            <div class="sing_in_up ">
+                <a href="{{url_for('logout')}}">LOGOUT</a>
+            </div>
+{%else%}
             <div class="sing_in_up ">
                 <a href="# ">SIGN IN</a>
                 <a href="{{url_for('register')}}">SIGN UP</a>
             </div>
+            {%endif%}
         </div>
     </section>
 

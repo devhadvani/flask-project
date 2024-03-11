@@ -10,8 +10,15 @@
         <ul class="menu-items">
             <li><a href="{{url_for('home')}}">Home</a></li>
             <li><a href="{{url_for('shop_products')}}">Shop</a></li>
-            <li><a href="#news">Blog</a></li>
-            <li><a href="#contact">Contact</a></li>
+        
+
+            {% if current_user.is_authenticated%}
+            <li><a href="/cart">Cart</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {%else%}
+    <li><a href="/login">login</a></li>
+            <li><a href="/register">register</a></li>
+            {%endif%}
         </ul>
         <div class="logo">
             <img src="https://i.postimg.cc/TP6JjSTt/logo.webp" alt="">

@@ -2,6 +2,8 @@
 routes.py
 this is routes.py file
 '''
+
+# Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 import os
 import jwt
 from functools import wraps
@@ -9,7 +11,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from werkzeug.utils import secure_filename
 from flask import render_template, request, redirect,jsonify
 from .__init__ import app, db
-from .models import Users, Category, Subcategory, Product
+from .models import Users, Category, Subcategory, Product,Cart
 import datetime
 from flask_login import LoginManager, UserMixin, login_user, logout_user,login_required
 # Define your routes here
@@ -65,7 +67,7 @@ def home():
     # Check if user is logged in
     if current_user.is_authenticated:
         # User is logged in
-        print("User is logged in.")
+        print("User is logged in.",current_user.id)
     else:
         # User is not logged in
         print("User is not logged in.")
@@ -114,6 +116,11 @@ def login():
 
     return render_template('login.html', message='', alert_type='info')
 
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect('/login')
 
 @app.route('/admin')
 @login_required
@@ -211,11 +218,13 @@ def shop_products():
 @app.route('/shop/<string:id>')
 def product_page(id):
     product = Product.query.get(id)
-    return render_template('product_page.html',product=product)
+    user_id = current_user.id
+    product_in_cart = Cart.query.filter_by(user_id=user_id, product_id=id).first() is not None
+    return render_template('product_page.html',product=product, cart = product_in_cart)
 
-# @login_manager.unauthorized_handler
-# def unauthorized_callback():
-#     return redirect('/login')
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect('/login')
 # @app.route('/search',methods=['GET','POST'])
 # def search():
 #     name = request.args.get('s')
@@ -223,3 +232,57 @@ def product_page(id):
 #     product = Product.query.filter(Product.name.like("%" + name + "%")).all()
 #     print(product)
 #     return render_template("/products.html",product=product,name=name)
+
+
+@login_required
+@app.route('/add_to_cart',methods=['POST'])
+def add_to_cart():
+    if request.method =="POST":
+        user_id = current_user.id
+        product_id  = request.form['product_id']
+        exist_product = Cart.query.filter_by(user_id=user_id,product_id=product_id).first()
+        if exist_product:
+            return redirect('/cart')
+        quantity = request.form['quantity']
+        
+        cart = Cart(user_id = user_id, quantity = quantity,product_id=product_id)
+        db.session.add(cart)
+        db.session.commit()
+        return redirect('/shop/'+product_id)
+
+@login_required
+@app.route('/cart',methods=['POST','GET'])
+def cart():
+    cart_item = Cart.query.filter_by(user_id= current_user.id)
+    return render_template('cart.html',cart_item=cart_item)
+
+
+
+
+@app.route('/update_quantity', methods=['POST'])
+def update_quantity():
+    if request.method == "POST":
+        action = request.form['action']
+        product_id = request.form['product_id']
+        quantity = request.form['quantity']
+        user_id  = current_user.id
+        cart  = Cart.query.filter_by(product_id=product_id, user_id = user_id).first()
+        # # print(cart)
+        if action == "increment":
+            cart.quantity += 1
+        else:
+            cart.quantity -=1
+        db.session.commit()
+        return redirect('cart')
+
+
+@app.route('/remove_from_cart', methods=['POST'])
+def remove_from_cart():
+    if request.method == "POST":
+        product_id = request.form['product_id']
+        print("sfkjshfkjsdf",product_id)
+        user_id  = current_user.id
+        cart  = Cart.query.filter_by(product_id=product_id, user_id = user_id).first()
+        db.session.delete(cart)
+        db.session.commit()
+        return redirect('cart')

@@ -3,7 +3,7 @@ from flask_login import UserMixin
 db = SQLAlchemy()
 
 class Users(UserMixin,db.Model):
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer,primary_key=True,autoincrement=True)
     email = db.Column(db.String(120))
     username = db.Column(db.String(80),nullable=True)
     password = db.Column(db.String(255),nullable=True)
@@ -32,6 +32,16 @@ class Product(db.Model):
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.subcategory_id'))
     category = db.relationship('Category', backref='products')
     subcategory = db.relationship('Subcategory', backref='products')
+
+class Cart(db.Model):
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'))
+    quantity = db.Column(db.Integer, default=1)
+    user = db.relationship('Users',backref='cart')
+    product = db.relationship('Product',backref='cart')
+
+
 
 # class ProductImage(db.Model):
 #     image_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
