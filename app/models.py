@@ -55,6 +55,18 @@ class Address(db.Model):
     user = db.relationship('Users',backref='address')
     # Define any additional methods or relationships here
 
+class Order(db.Model):
+    order_id =  db.Column(db.Integer, primary_key=True, autoincrement=True)
+    address_id = db.Column(db.Integer, db.ForeignKey('address.id'))
+    user_id  = db.Column(db.Integer, db.ForeignKey('users.id'))
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'))
+    quantity = db.Column(db.Integer, default=1)
+    total_price = db.Column(db.Float)
+    order_date = db.Column(db.DateTime)
+    product = db.relationship('Product', backref='order')
+    user = db.relationship('User', backref='order')
+    address = db.relationship('Address', backref='order')
+
 
 # class ProductImage(db.Model):
 #     image_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
