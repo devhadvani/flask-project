@@ -64,7 +64,7 @@ class Order(db.Model):
     total_price = db.Column(db.Float)
     order_date = db.Column(db.DateTime)
     product = db.relationship('Product', backref='order')
-    user = db.relationship('User', backref='order')
+    user = db.relationship('Users', backref='order')
     address = db.relationship('Address', backref='order')
 
 

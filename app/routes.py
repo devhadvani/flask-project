@@ -9,22 +9,25 @@ import jwt
 from functools import wraps
 from werkzeug.security import generate_password_hash,check_password_hash
 from werkzeug.utils import secure_filename
-from flask import render_template, request, redirect,jsonify
+from flask import render_template, request, redirect,jsonify, make_response,session,url_for
 from .__init__ import app, db
-from .models import Users, Category, Subcategory, Product,Cart, Address
-import datetime
+from .models import Users, Category, Subcategory, Product,Cart, Address,Order
+from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, logout_user,login_required
-# Define your routes here
 from flask_login import current_user
+from flask_caching import Cache
+from flask_session import Session
 
-
-
+cache = Cache(app)
+app.config['CACHE_TYPE'] = 'simple'  
+app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 UPLOAD_FOLDER = 'app/static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
+app.config['SESSION_TYPE'] = 'sqlalchemy'
+app.config['SESSION_SQLALCHEMY'] = db
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY']='004f2af45d3a4e161a7dd2d17fdae47f'
-
+Session(app)
 
 print(os.getcwd)
 
@@ -45,6 +48,28 @@ print(os.getcwd)
  
 #        return f(current_user, *args, **kwargs)
 #    return decorator
+def token_require(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = session.get('jwt_token')
+        if not token:
+            return redirect(url_for('login'))
+
+        try:
+            decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            email = decoded_token['public_id']
+            user = Users.query.filter_by(email=email).first()
+            if not user:
+                return jsonify({'message': 'User not found'}), 404
+
+            # Pass the user object to the wrapped function
+            return f(user, *args, **kwargs)
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired'}), 401
+        except (jwt.InvalidTokenError, jwt.DecodeError):
+            return jsonify({'message': 'Invalid token'}), 401
+
+    return decorated_function
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -93,28 +118,26 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST','GET'])
 def login():
-    if request.method == 'POST':
-        username = request.form.get('email')
-        password = request.form.get('password')
+    if request.method == "POST":
+        username = request.form['email']
+        password = request.form['password']
         
         if not username or not password:
-            return render_template('login.html', message='Username and password are required', alert_type='danger')
+            return jsonify({'message': 'Username and password are required'}), 400
 
         user = Users.query.filter_by(email=username).first()
         if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect('/')
-        # if user and check_password_hash(user.password, password):
-        #     token = jwt.encode({'public_id': user.email, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)}, app.config['SECRET_KEY'], algorithm='HS256')
-            # return jsonify({'token': token})
-            # request.header = token
-            # return render_template('/index.html', token=token)
+            token = jwt.encode({'public_id': user.email, 'exp': datetime.utcnow() + timedelta(minutes=45)}, app.config['SECRET_KEY'], algorithm='HS256')
+            response = make_response(redirect('/shop'))
+            session['jwt_token'] = token
+            return response
+        else:
+            return jsonify({'message': 'Invalid username or password'}), 401
+    return render_template('login.html')
 
-        return render_template('login.html', message='Invalid username or password', alert_type='danger')
 
-    return render_template('login.html', message='', alert_type='info')
 
 
 @app.route('/logout')
@@ -204,19 +227,27 @@ def update_product(id):
     return render_template('admin/update_product.html',product=product,category=category,sub_category=sub_category)
 
 @app.route('/shop', methods=['GET', 'POST'])
-@login_required
-def shop_products():
+@cache.cached(timeout=300)
+# @login_required
+@token_require
+def shop_products(current_user):
     page = request.args.get('page', 1, type=int)
+    print("current user id :-",current_user.id)
+    print("current user email :-",current_user.email)
+    print("current user  :-",current_user.username)
     name = request.args.get('s')
 
     if name:
-        products = Product.query.filter(Product.name.like(f"%{name}%")).paginate(page=page, per_page=2)
+        products = Product.query.filter(Product.name.like(f"%{name}%")).paginate(page=page, per_page=20)
     else:
-        products = Product.query.paginate(page=page, per_page=2)
+        products = Product.query.paginate(page=page, per_page=20)
     return render_template('products.html', product=products, name=name)
 
 @app.route('/shop/<string:id>')
+@cache.cached(timeout=300)
 def product_page(id):
+    time = datetime.utcnow()
+    print("Current time:", time)
     product = Product.query.get(id)
     user_id = current_user.id
     product_in_cart = Cart.query.filter_by(user_id=user_id, product_id=id).first() is not None
@@ -252,7 +283,9 @@ def add_to_cart():
 
 @login_required
 @app.route('/cart',methods=['POST','GET'])
+@cache.cached(timeout=300)
 def cart():
+    print("Current time:", datetime.utcnow())
     address_count = Address.query.filter_by(user_id=current_user.id).count()
     address = Address.query.filter_by(user_id=current_user.id)
     cart_item = Cart.query.filter_by(user_id= current_user.id)
@@ -308,4 +341,40 @@ def add_address():
         return redirect('/cart')
 
 
+@login_required
+@app.route('/check_out',methods=['GET','POST'])
+def check_out():
+    address = Address.query.filter_by(user_id = current_user.id)
+    cart_item = Cart.query.filter_by(user_id= current_user.id)
+    if request.method == 'POST':
+        user_id = current_user.id
+        address_id = request.form['selected_address']
+        order_date = datetime.now()       
 
+        for cart in cart_item:
+            order = Order(
+                address_id=address_id,
+                user_id=user_id,
+                product_id=cart.product_id,
+                quantity=cart.quantity,
+                total_price=cart.product.price * cart.quantity,
+                order_date=order_date
+            )
+            db.session.add(order)
+            db.session.delete(cart)
+
+
+        # Commit the changes to the database
+        
+        db.session.commit()
+
+
+    return render_template('checkout.html',address = address,cart_item=cart_item)
+
+
+
+
+@app.route('/my_orders')
+def my_orders():
+    order = Order.query.filter_by(user_id = current_user.id)
+    return render_template('myorders.html',order=order)
