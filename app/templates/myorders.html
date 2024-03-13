@@ -1,4 +1,78 @@
-{% for order in order%}
-{{order.product.name}}
-<br>
-{% endfor%}
+<html>
+    <head>
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .orders-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .order-item {
+        width: 300px;
+        margin: 20px;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .order-details {
+        text-align: center;
+    }
+    
+    .order-details h2 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+    
+    .order-details img {
+        width: 100%;
+        border-radius: 5px;
+    }
+    
+    .order-details p {
+        margin: 5px 0;
+    }
+    
+    .order-details strong {
+        font-weight: bold;
+    }
+    
+    .order-details p:last-child {
+        margin-bottom: 0;
+    }
+    
+    </style>
+    </head>
+    {%include 'nav.html'%}
+    
+    <body>
+    
+        <h1>Your Current Orders</h1>
+    
+        <div class="orders-container">
+            {% for order in order %}
+            {% if order.status != "Delivered" %}
+            <div class="order-item">
+                <div class="order-details">
+                    <h2>{{ order.product.name }}</h2>
+                    <img src="{{ url_for('static', filename='uploads/' + order.product.image_url) }}" alt="Product Image">
+                    <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+                    <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                    <p><strong>Total Price:</strong> {{ order.total_price }}</p>
+                    <h4 style="color : green"><strong>Status:</strong> {{ order.status }}</h4>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    
+    </body>
+    
+    </html>
+    

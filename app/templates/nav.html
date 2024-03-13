@@ -11,14 +11,15 @@
             <li><a href="{{url_for('home')}}">Home</a></li>
             <li><a href="{{url_for('shop_products')}}">Shop</a></li>
         
-
-            {% if current_user.is_authenticated%}
+            <li><a href="{{url_for('my_orders')}}">Orders</a></li>
+            {% if 'jwt_token' in session %}
             <li><a href="/cart">Cart</a></li>
             <li><a href="/logout">Logout</a></li>
-            {%else%}
-    <li><a href="/login">login</a></li>
-            <li><a href="/register">register</a></li>
-            {%endif%}
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+            {% endif %}
+            <li><a href="{{url_for('account')}}">Profile</a></li>
         </ul>
         <div class="logo">
             <img src="https://i.postimg.cc/TP6JjSTt/logo.webp" alt="">

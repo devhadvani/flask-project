@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h2 {
+            color: #666;
+        }
+
+        .address-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .address-actions {
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .img{
+            height:100px;
+            width:100px;
+        }
+        .order-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .order-image {
+            flex: 0 0 100px;
+            height: 100px;
+            margin-right: 20px;
+            border-radius: 5px;
+        }
+
+        .order-details {
+            flex: 1;
+        }
+
+        .order-title {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .order-quantity,
+        .order-price {
+            font-size: 14px;
+            color: #666;
+        }
+        a{text-decoration: none; color: #}
+    </style>
+</head>
+
+<body>
+     {% include 'nav.html' %}
+    <div class="container">
+        <h1>Welcome, {{ user.username }}</h1>
+        <h2>My Email: {{ user.email }}</h2>
+
+        <h2>Address:</h2>
+        {% for address in address %}
+        <div class="address-container">
+            <p><strong>Name:</strong> {{ address.name }}</p>
+            <p><strong>Street Address:</strong> {{ address.street_address }}</p>
+            <p><strong>City:</strong> {{ address.city }}</p>
+            <p><strong>State:</strong> {{ address.state }}</p>
+            <p><strong>Postal Code:</strong> {{ address.postal_code }}</p>
+            <p><strong>Country:</strong> {{ address.country }}</p>
+            <p><strong>Phone Number:</strong> {{ address.phone_number }}</p>
+            <div class="address-actions">
+                <a href="" class="btn btn-primary">Update</a>
+                <a href="" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+        <h2>My Orders:</h2>
+   <h3> your current orders</h3>   
+     {% for order in order %}
+       
+        {%if order.status != "Delivered"%}
+        <a href='/shop/{{order.product_id}}'>
+        <div class="order-card">
+            <img src="{{ url_for('static', filename='uploads/' + order.product.image_url) }}" alt="Product Image"
+                class="order-image">
+            <div class="order-details">
+                <p class="order-title">{{ order.product.name }}</p>
+                <p class="order-quantity">Quantity: {{ order.quantity }}</p>
+                <p class="order-price">Price: ${{ order.product.price }}</p>
+                <h4 style="color:green"> Status : {{order.status}}</h4>
+        
+                       {%if order.status !="Shipped" %}
+                <a href="/remove_order/{{order.order_id}}"><button>Cancel order</a></button>
+                {%endif%}
+        </div> 
+        </div></a>
+        {%endif%}
+        {%endfor%}
+        <h3> your past orders</h3>
+        {% for order in order %}
+
+        
+        {%if order.status == "Delivered"%}
+        <a href='/shop/{{order.product_id}}'>
+        <div class="order-card">
+            <img src="{{ url_for('static', filename='uploads/' + order.product.image_url) }}" alt="Product Image"
+                class="order-image">
+            <div class="order-details">
+                <p class="order-title">{{ order.product.name }}</p>
+                <p class="order-quantity">Quantity: {{ order.quantity }}</p>
+                <p class="order-price">Price: ${{ order.product.price }}</p>
+                <h4 style="color:green"> Status : {{order.status}}</h4>
+            </div>
+        </div></a>
+
+        {%endif%}
+        {% endfor %}
+    </div>
+</body>
+
+</html>
