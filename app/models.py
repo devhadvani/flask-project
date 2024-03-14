@@ -77,6 +77,11 @@ class Order(db.Model):
     address = db.relationship("Address", backref="order")
 
 
+class Admin(db.Model):
+    admin_name =db.Column(db.String(50),primary_key=True)
+    password = db.Column(db.String(255), nullable=True)
+
+
 # class ProductImage(db.Model):
 #     image_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 #     product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'))

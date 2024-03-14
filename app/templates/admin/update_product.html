@@ -10,9 +10,7 @@
         <input type="number" id="price" name="price" step="0.01" value="{{product.price}}" required>
         <label for="stock_quantity">Stock Quantity:</label>
         <input type="number" id="stock_quantity" name="stock_quantity" value="{{product.stock_quantity}}" required>
-       
-       
-       
+ 
         <label for="category_id">Category ID:</label>
         <select name="cid">
             {% for category in category %}
@@ -31,6 +29,6 @@
 
 
       
-        <input type="file" name="image" multiple="true">
+        <input type="file" name="image" >
         <button type="submit">update Product</button>
     </form>

@@ -13,7 +13,7 @@
         
             <li><a href="{{url_for('my_orders')}}">Orders</a></li>
             {% if 'jwt_token' in session %}
-            <li><a href="/cart">Cart</a></li>
+            <li><a href="/cart">Cart  {%if total_cart_count%} ({{total_cart_count}}) {% endif %}</a></li>
             <li><a href="/logout">Logout</a></li>
             {% else %}
             <li><a href="/login">Login</a></li>

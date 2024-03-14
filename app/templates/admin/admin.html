@@ -102,6 +102,14 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .logout{
+            padding: 10px 20px;
+            background-color: #D6D6D6;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
         button:hover {
             background-color: #0056b3;
         }
@@ -110,6 +118,7 @@
 <body>
     <div class="container">
         <a href="/admin/orders"><button>Go to orders</button></a>
+        <a href="/admin_logout"><button class="logout">Logout</button></a>
         <h1>Add Category</h1>
         <form action="/add_category" method="post">
             <div class="form-row">

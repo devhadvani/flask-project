@@ -64,15 +64,38 @@
 </head>
 
 <body>
-
+    <a href="/admin"><button class="logout">back</button></a>
     <h1>Current Orders</h1>
-
+    
+    <!-- Filter form -->
+    <form id="filterForm" method="post">
+        <label for="statusFilter">Filter by Status:</label>
+        <select name="status" id="statusFilter">
+            <option>select</option>
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+        </select>
+    </form>
+    
+    <!-- Display order counts -->
+    {% for status, count in order_counts.items() %}
+        <p>{{ status }}: {{ count }}</p>
+    {% endfor %}
+    
+    <!-- Display orders -->
+    {% for order in orders %}
+        <!-- Display order details -->
+    {% endfor %}
+    
     <div class="orders-container">
         {% for order in orders %}
         <div class="order-container">
             <img src="{{ url_for('static', filename='uploads/' + order.product.image_url) }}" alt="Product Image">
             <p><strong>Order ID:</strong> {{ order.order_id }}</p>
-            <p><strong>Customer </strong> {{ order.user.username }}</p>
+            <p><strong>Customer </strong> {{ order.user.email }}</p>
 
             <p><strong>Product Name:</strong> {{ order.product.name }}</p>
             <p><strong>Quantity:</strong> {{ order.quantity }}</p>
@@ -96,6 +119,11 @@
         {% endfor %}
     </div>
 
+    <script>
+        document.getElementById("statusFilter").addEventListener("change", function() {
+            console.log("Form submitted");
+            document.getElementById("filterForm").submit();
+        });
+    </script>
 </body>
-
 </html>

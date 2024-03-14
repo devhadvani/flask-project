@@ -10,12 +10,11 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
+
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
@@ -121,8 +120,8 @@
             <p><strong>Country:</strong> {{ address.country }}</p>
             <p><strong>Phone Number:</strong> {{ address.phone_number }}</p>
             <div class="address-actions">
-                <a href="" class="btn btn-primary">Update</a>
-                <a href="" class="btn btn-danger">Delete</a>
+                <a href="/update_address/{{address.id}}" class="btn btn-primary">Update</a>
+                <a href="/delete_address/{{address.id}}" class="btn btn-danger">Delete</a>
             </div>
         </div>
         {% endfor %}
@@ -142,7 +141,7 @@
                 <h4 style="color:green"> Status : {{order.status}}</h4>
         
                        {%if order.status !="Shipped" %}
-                <a href="/remove_order/{{order.order_id}}"><button>Cancel order</a></button>
+                <a href="/remove_order/{{order.order_id}}"><button class="btn btn-danger">Cancel order</a></button>
                 {%endif%}
         </div> 
         </div></a>
@@ -162,7 +161,10 @@
                 <p class="order-quantity">Quantity: {{ order.quantity }}</p>
                 <p class="order-price">Price: ${{ order.product.price }}</p>
                 <h4 style="color:green"> Status : {{order.status}}</h4>
-            </div>
+              <a href="/download_bill/{{order.order_id}}">
+            <button  class="btn btn-primary" >download bill</button></a>   
+         </div>
+      
         </div></a>
 
         {%endif%}

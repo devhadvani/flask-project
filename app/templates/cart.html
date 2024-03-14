@@ -113,14 +113,7 @@
         color: #43484D;
         font-weight: 300;
       }
-      button[class*=btn] {
-        width: 30px;
-        height: 30px;
-        background-color: #E1E8EE;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-      }
+     
       .minus-btn img{
         margin-bottom: 3px;
       }
@@ -174,14 +167,32 @@
         height: 100px;
         width: 100px;
       }
+      .place-order-btn {
+        display: inline-block;
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .place-order-btn:hover {
+        background-color: #45a049;
+    }
 </style>
 
 </head>
 <body>
     {% include 'nav.html' %}
    
-
     <div class="shopping-cart">
+      {% if cart_item | length > 0 %}
+
         <div class="title">
             Shopping Bag
         </div>
@@ -219,8 +230,8 @@
         {% endfor %}
         <!-- End Product Loop -->
 
-    </div>
-
+    
+<!--
     {% for address in address%}
 {{address.name}}:
 {{address.city}}
@@ -228,41 +239,20 @@
 {{address.street_address}}
 <br>
     {%endfor%}
+ -->
 
+  
 
-    {%if address_count <=2%}
-    <h2>Add Address</h2>
-    <form action="/add_address" method="post">
-        <label for="name">Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
-
-        <label for="street_address">Street Address:</label><br>
-        <input type="text" id="street_address" name="street_address" required><br><br>
-
-        <label for="city">City:</label><br>
-        <input type="text" id="city" name="city" required><br><br>
-
-        <label for="state">State:</label><br>
-        <input type="text" id="state" name="state" required><br><br>
-
-        <label for="postal_code">Postal Code:</label><br>
-        <input type="text" id="postal_code" name="postal_code" required><br><br>
-
-        <label for="country">Country:</label><br>
-        <input type="text" id="country" name="country" required><br><br>
-
-        <label for="phone_number">Phone Number:</label><br>
-        <input type="text" id="phone_number" name="phone_number" required><br><br>
-
-        <label for="is_default">Is Default:</label><br>
-        <input type="checkbox" id="is_default" name="is_default"><br><br>
-
-        <input type="submit" value="Submit">
-    </form>
-
-    {%endif%}
     <a href="/check_out">
-<button> place order</button></a>
+<button class='place-order-btn'> place order</button></a>
+{%else%}
+
+<a href="/shop">
+  <button class='place-order-btn'> shop and add to cart to place order</button></a>
+
+{% endif%}
+</div>
+
 
     <script>
         // JavaScript for quantity increment and decrement
